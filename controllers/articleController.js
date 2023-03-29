@@ -1,4 +1,4 @@
-const {Article} = require('../models');
+const {Article, Comment} = require('../models');
 
 module.exports.renderAddForm = function(req, res){
     const article = {
@@ -23,8 +23,18 @@ module.exports.addArticle = async function(req, res){
 };
 
 module.exports.displayArticle = async function(req, res){
-    const article = await Article.findByPk(req.params.articleId,{
-        include: ['author']
+    const article = await Article.findByPk(req.params.articleId, {
+        include: [
+            'author',
+            {
+                model: Comment,
+                as: 'comments',
+                required: false
+            }
+        ],
+        order: [
+            ['comments', 'commented_on', 'desc']
+        ]
     });
     res.render('articles/view', {article});
 };
@@ -52,5 +62,14 @@ module.exports.updateArticle = async function(req, res){
             id: req.params.articleId
         }
     });
-    res.render(`/article/${req.params.articleId}`);
+    res.redirect(`/article/${req.params.articleId}`);
+};
+
+module.exports.deleteArticle = async function(req, res){
+    await Article.destroy({
+        where: {
+            id: req.params.articleId
+        }
+    });
+    res.redirect('/')
 };
