@@ -32,7 +32,7 @@ app.use(passport.initialize());
 app.use(passport.authenticate('session'));
 app.use(function(req, res, next){
   if (req.user){
-    res.locls.user = req.user;
+    res.locals.user = req.user;
   };
   next();
 });
